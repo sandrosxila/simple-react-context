@@ -1,8 +1,14 @@
+import { useQuery } from "@tanstack/react-query";
 import { useShop } from "../hooks/useShop";
 import styles from "./products.module.css";
+import { Product } from "../models/product";
 
 export const Products = () => {
-  const { products, addToCart } = useShop();
+  const { addToCart } = useShop();
+  const { data: products = [], error, isLoading } = useQuery<Product[]>({queryKey: ['products']});
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div className={styles["products-container"]}>
