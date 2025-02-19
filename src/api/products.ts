@@ -1,16 +1,19 @@
 import { Paginated } from '../models/api';
 import { Product } from '../models/product';
+import { getObjectWithDefinedProperties } from '../utils/objectHelpers';
 
-export const getProducts = async (): Promise<Product[]> => {
-  const response = await fetch('http://localhost:5000/products');
-  if (!response.ok) {
-    throw new Error('Network response was not ok');
-  }
-  return response.json();
-};
+export async function getProducts(params: Partial<{ 
+  page: number; 
+  perPage: number; 
+  sort: string[];
+}> = {}): Promise<Paginated<Product> | Product[]> {
+  const queryParams = new URLSearchParams(getObjectWithDefinedProperties({
+    _page: params.page?.toString(),
+    _per_page: params.perPage?.toString(),
+    _sort: params.sort?.join(',')
+  }));
 
-export const getProductsByPage = async (page = 1): Promise<Paginated<Product>> => {
-  const response = await fetch(`http://localhost:5000/products?_page=${page}&_per_page=3`);
+  const response = await fetch(`http://localhost:5000/products?${queryParams.toString()}`);
   if (!response.ok) {
     throw new Error('Network response was not ok');
   }

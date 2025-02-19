@@ -3,8 +3,11 @@ import { useShop } from "../hooks/useShop";
 import styles from "./products.module.css";
 import { Product } from "../models/product";
 import { Paginated } from "../models/api";
-import {getProductsByPage} from '../api/products';
+import { getProducts } from '../api/products';
 import { useState } from "react";
+import { SortOrder } from "../models/utils";
+
+const PAGE_SIZE = 3;
 
 const DEFAULT_PAGINATION_STATE : Paginated<Product> = {
   first: 0,
@@ -20,10 +23,16 @@ export const Products = () => {
   const { addToCart } = useShop();
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortBy, setSortBy] = useState<'name' | 'price'>('name');
+  const [orderBy, setOrderBy] = useState<SortOrder>('asc');
   
-  const { data = DEFAULT_PAGINATION_STATE, error, isLoading } = useQuery<Paginated<Product>>({
-    queryFn: () => getProductsByPage(currentPage),
-    queryKey: ['products', currentPage]
+  const { data = DEFAULT_PAGINATION_STATE, error, isLoading } = useQuery({
+    queryFn: () => getProducts({
+      page: currentPage,
+      perPage: PAGE_SIZE,
+      sort: [(orderBy === 'asc' ? '' : '-') + sortBy]
+    }) as Promise<Paginated<Product>>,
+    queryKey: ['products', currentPage, sortBy, orderBy]
   });
 
   const { data : products, prev, next, last, pages} = data;
@@ -34,6 +43,20 @@ export const Products = () => {
   return (
     <div className={styles["products-container"]}>
       <h1 className={styles["title"]}>Products</h1>
+
+      <div className={styles["sort-container"]}>
+        <label htmlFor="sortBy">Sort By:</label>
+        <select id="sortBy" value={sortBy} onChange={(e) => setSortBy(e.target.value as Exclude<keyof Product, 'id'>)}>
+          <option value="name">Name</option>
+          <option value="price">Price</option>
+        </select>
+        <label htmlFor="orderBy">Order By:</label>
+        <select id="orderBy" value={orderBy} onChange={(e) => setOrderBy(e.target.value as SortOrder)}>
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </div>
+
       <ul className={styles["products-list"]}>
         {products.map((product) => (
           <li key={product.id} className={styles["product-card"]}>
@@ -42,6 +65,7 @@ export const Products = () => {
           </li>
         ))}
       </ul>
+
       <div className={styles["pagination"]}>
         <button
           className={styles.button}
