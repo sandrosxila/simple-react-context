@@ -31,7 +31,7 @@ export const Products = () => {
       page: currentPage,
       perPage: PAGE_SIZE,
       sort: [(orderBy === 'asc' ? '' : '-') + sortBy]
-    }) as Promise<Paginated<Product>>,
+    }),
     queryKey: ['products', currentPage, sortBy, orderBy]
   });
 
@@ -42,7 +42,7 @@ export const Products = () => {
 
   return (
     <div className={styles["products-container"]}>
-      <h1 className={styles["title"]}>Products</h1>
+      <h1 className={styles.title}>Products</h1>
 
       <div className={styles["sort-container"]}>
         <label htmlFor="sortBy">Sort By:</label>
@@ -66,7 +66,7 @@ export const Products = () => {
         ))}
       </ul>
 
-      <div className={styles["pagination"]}>
+      <div className={styles.pagination}>
         <button
           className={styles.button}
           onClick={() => setCurrentPage(prev)}
