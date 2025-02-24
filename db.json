@@ -78,22 +78,22 @@
     {
       "id": "16",
       "name": "Blue Headphones",
-      "price": "123"
+      "price": 123
     },
     {
       "id": "bf3e",
       "name": "Green Headphones",
-      "price": "321"
+      "price": 321
     },
     {
       "id": "807d",
       "name": "Albums",
-      "price": "244"
+      "price": 244
     },
     {
       "id": "40db",
       "name": "Artworks",
-      "price": "555"
+      "price": 555
     }
   ]
 }

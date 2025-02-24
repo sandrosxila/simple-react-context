@@ -70,6 +70,7 @@ export const ProductForm = () => {
             {...register("price", {
               required: "Please Enter Product Price",
               min: { value: 0, message: "Price Must be a positive number" },
+              valueAsNumber: true
             })}
           />
           {errors.price && (

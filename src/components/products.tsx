@@ -89,7 +89,7 @@ export const Products = () => {
           Previous
         </button>
         <span className={styles["pagination-info"]}>
-          Page {currentPage} of {pages}
+          Page {currentPage} of {pages} 
         </span>
         <button
           className={styles.button}
