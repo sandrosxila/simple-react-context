@@ -39,3 +39,18 @@ export async function addProduct(product: Omit<Product, "id">): Promise<Product>
   }
   return response.json();
 }
+
+export async function deleteProduct(productId: string) {
+  const response = await fetch(`http://localhost:5000/products/${productId}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to remove product');
+  }
+
+  return response.json();
+}

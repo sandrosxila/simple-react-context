@@ -30,6 +30,11 @@
   margin-bottom: 10px;
 }
 
+.product-buttons {
+  display: flex;
+  gap: 8px;
+}
+
 .comments-list {
   list-style: none;
   padding-left: 10px;
@@ -62,6 +67,18 @@
 .button:disabled {
   background-color: #c0c0c0;
   cursor: not-allowed;
+}
+
+.bg-red {
+  background-color: #ff0000d6;
+}
+
+.bg-red:hover {
+  background-color: #b30000;
+}
+
+.bg-red:active {
+  background-color: #850000;
 }
 
 .pagination {

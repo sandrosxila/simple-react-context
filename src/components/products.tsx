@@ -1,9 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
+import classNames from 'classnames';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import { useShop } from "../hooks/useShop";
 import styles from "./products.module.css";
 import { Product } from "../models/product";
 import { Paginated } from "../models/api";
-import { getProducts } from '../api/products';
+import { getProducts, deleteProduct } from '../api/products';
 import { useState } from "react";
 import { SortOrder } from "../models/utils";
 
@@ -26,6 +27,8 @@ export const Products = () => {
   const [sortBy, setSortBy] = useState<'name' | 'price'>('name');
   const [orderBy, setOrderBy] = useState<SortOrder>('asc');
   
+  const queryClient = useQueryClient();
+
   const { data = DEFAULT_PAGINATION_STATE, error, isLoading } = useQuery({
     queryFn: () => getProducts({
       page: currentPage,
@@ -35,7 +38,15 @@ export const Products = () => {
     queryKey: ['products', currentPage, sortBy, orderBy]
   });
 
-  const { data : products, prev, next, last, pages} = data;
+  const { mutate: removeProduct } = useMutation({
+    mutationFn: deleteProduct,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      alert("Product Removed Successfully");
+    }
+  })
+
+  const { data : products, prev, next, first, last, pages} = data;
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -61,7 +72,10 @@ export const Products = () => {
         {products.map((product) => (
           <li key={product.id} className={styles["product-card"]}>
             <h2 className={styles["product-name"]}>{product.name} - ${product.price}</h2>
-            <button className={styles.button} onClick={() => addToCart(product)}>Add to Cart</button>
+            <div className={styles["product-buttons"]}>
+              <button className={styles.button} onClick={() => addToCart(product)}>Add to Cart</button>
+              <button className={classNames(styles.button, styles["bg-red"])} onClick={() => removeProduct(product.id)}>Remove Product</button>
+            </div>
           </li>
         ))}
       </ul>
@@ -69,8 +83,8 @@ export const Products = () => {
       <div className={styles.pagination}>
         <button
           className={styles.button}
-          onClick={() => setCurrentPage(prev)}
-          disabled={currentPage === 1}
+          onClick={() => setCurrentPage(prev ?? first)}
+          disabled={prev === null}
         >
           Previous
         </button>
@@ -79,8 +93,8 @@ export const Products = () => {
         </span>
         <button
           className={styles.button}
-          onClick={() => setCurrentPage(next)}
-          disabled={currentPage === last}
+          onClick={() => setCurrentPage(next ?? last)}
+          disabled={next === null}
         >
           Next
         </button>
