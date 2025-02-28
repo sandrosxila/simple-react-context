@@ -7,6 +7,8 @@ import { Paginated } from "../models/api";
 import { getProducts, deleteProduct } from '../api/products';
 import { useState } from "react";
 import { SortOrder } from "../models/utils";
+import { Modal } from './modal';
+import { useModal } from '../hooks/useModal';
 
 const PAGE_SIZE = 3;
 
@@ -22,6 +24,7 @@ const DEFAULT_PAGINATION_STATE : Paginated<Product> = {
 
 export const Products = () => {
   const { addToCart } = useShop();
+  const { open, id, openModal, closeModal } = useModal();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [sortBy, setSortBy] = useState<'name' | 'price'>('name');
@@ -48,6 +51,12 @@ export const Products = () => {
 
   const { data : products, prev, next, first, last, pages} = data;
 
+  const onModalSubmit = () =>{ 
+    if(id) { 
+      removeProduct(id);
+    }
+  }
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
 
@@ -68,13 +77,21 @@ export const Products = () => {
         </select>
       </div>
 
+      <Modal 
+        title={"Are You Sure You Want to delete?"} 
+        content='Your data will be permanently destroyed' 
+        open={open} 
+        onSubmit={onModalSubmit} 
+        onClose={closeModal}
+      />
+
       <ul className={styles["products-list"]}>
         {products.map((product) => (
           <li key={product.id} className={styles["product-card"]}>
             <h2 className={styles["product-name"]}>{product.name} - ${product.price}</h2>
             <div className={styles["product-buttons"]}>
               <button className={styles.button} onClick={() => addToCart(product)}>Add to Cart</button>
-              <button className={classNames(styles.button, styles["bg-red"])} onClick={() => removeProduct(product.id)}>Remove Product</button>
+              <button className={classNames(styles.button, styles["bg-red"])} onClick={() => openModal(product.id)}>Remove Product</button>
             </div>
           </li>
         ))}
